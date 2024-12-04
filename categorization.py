@@ -8,15 +8,26 @@ revision = "main"
 # If using CPU, set device=-1 (which is the default)
 classifier = pipeline("zero-shot-classification", model=model_name, revision=revision, device=-1)
 
-def categorize_text(text: str, candidate_labels=None, top_k=3):
-    # Define default candidate labels if none are provided
+
+def categorize_text_with_tags_and_category(text: str, tags=None, category=None, candidate_labels=None, top_k=3):
+    # Define default candidate labels in Portuguese if none are provided
     if candidate_labels is None:
         candidate_labels = [
-            "Sports", "Politics", "Music", "News", "Technology", "Entertainment",
-            "Health", "Education", "Science", "Travel", "Food", "Lifestyle",
-            "Gaming", "Business", "Environment", "Casual", "Family", "Humor",
-            "Religion", "Hypnosis", "Classes", "Learning", "Animals", "Nature", "Risky"
+            "Esportes", "Política", "Música", "Notícias", "Tecnologia", "Entretenimento",
+            "Saúde", "Educação", "Ciência", "Viagem", "Comida", "Estilo de Vida",
+            "Jogos", "Negócios", "Meio Ambiente", "Casual", "Família", "Humor",
+            "Religião", "Hipnose", "Aulas", "Aprendizagem", "Animais", "Natureza", "Arriscado"
         ]
+
+    # Add the video category to the candidate labels if provided
+    if category and category not in candidate_labels:
+        candidate_labels.append(category)
+
+    # If tags are provided, include them in the candidate labels
+    if tags:
+        for tag in tags:
+            if tag not in candidate_labels:
+                candidate_labels.append(tag)
 
     if not text:
         raise ValueError("Input text cannot be empty")
@@ -30,7 +41,10 @@ def categorize_text(text: str, candidate_labels=None, top_k=3):
 
     return {'categories': top_categories, 'scores': top_scores}
 
+
 # Example Usage
-text = "The latest innovations in AI and machine learning are transforming industries."
-result = categorize_text(text, top_k=3)
-print(result)  # Output: {'categories': ['Technology', 'Science', 'Business'], 'scores': [0.89, 0.08, 0.03]}
+text = "As últimas inovações em IA e aprendizado de máquina estão transformando as indústrias."
+tags = ["IA", "Tecnologia", "Inovação"]
+category = "Tecnologia"  # e.g., category retrieved from YouTube API
+result = categorize_text_with_tags_and_category(text, tags, category, top_k=3)
+print(result)  # Output: {'categories': ['Tecnologia', 'Ciência', 'Negócios'], 'scores': [0.89, 0.08, 0.03]}

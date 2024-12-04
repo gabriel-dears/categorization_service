@@ -5,7 +5,7 @@ import json
 import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from categorization import categorize_text
+from categorization import categorize_text_with_tags_and_category
 from contextlib import asynccontextmanager
 
 # Configure logging
@@ -73,12 +73,14 @@ async def consume_messages():
             # Decode the message
             message_data = json.loads(body.decode("utf-8"))
             transcription_text = message_data.get("transcription")
+            transcription_tags = message_data.get("tags")
+            transcription_category = message_data.get("category")
 
             if not transcription_text:
                 raise ValueError("Missing transcription text in message")
 
             # Categorize the transcription
-            category = categorize_text(transcription_text)
+            category = categorize_text_with_tags_and_category(transcription_text, tags=transcription_tags, category=transcription_category)
             logger.info(f"Categorized transcription: {category}")
 
             # Send the categorized message to the next queue
