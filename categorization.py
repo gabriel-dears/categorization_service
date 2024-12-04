@@ -9,7 +9,7 @@ revision = "main"
 classifier = pipeline("zero-shot-classification", model=model_name, revision=revision, device=-1)
 
 
-def categorize_text_with_tags_and_category(text: str, tags=None, category=None, candidate_labels=None, top_k=3):
+def categorize_text_with_tags_and_category(text: str, tags=None, category=None, candidate_labels=None, top_k=5):
     # Define default candidate labels in Portuguese if none are provided
     if candidate_labels is None:
         candidate_labels = [
@@ -46,5 +46,5 @@ def categorize_text_with_tags_and_category(text: str, tags=None, category=None, 
 text = "As últimas inovações em IA e aprendizado de máquina estão transformando as indústrias."
 tags = ["IA", "Tecnologia", "Inovação"]
 category = "Tecnologia"  # e.g., category retrieved from YouTube API
-result = categorize_text_with_tags_and_category(text, tags, category, top_k=3)
+result = categorize_text_with_tags_and_category(text, tags, category, top_k=5)
 print(result)  # Output: {'categories': ['Tecnologia', 'Ciência', 'Negócios'], 'scores': [0.89, 0.08, 0.03]}

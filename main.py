@@ -47,11 +47,11 @@ def send_to_queue(queue_name: str, message: dict):
         channel.queue_declare(queue=queue_name, durable=True)
         channel.queue_bind(exchange=EXCHANGE_NAME, queue=queue_name, routing_key=queue_name)
 
-        # Publish the message
+        # Publish the message with `ensure_ascii=False` to prevent escaping non-ASCII characters
         channel.basic_publish(
             exchange=EXCHANGE_NAME,
             routing_key=queue_name,
-            body=json.dumps(message),
+            body=json.dumps(message, ensure_ascii=False),  # Avoid escaping non-ASCII characters
             properties=pika.BasicProperties(delivery_mode=2),  # Make message persistent
         )
         logger.info(f"Message sent to queue '{queue_name}': {message}")
@@ -60,6 +60,7 @@ def send_to_queue(queue_name: str, message: dict):
     except Exception as e:
         logger.error(f"Failed to send message to queue '{queue_name}': {e}")
         raise e
+
 
 
 async def consume_messages():
@@ -75,6 +76,9 @@ async def consume_messages():
             transcription_text = message_data.get("transcription")
             transcription_tags = message_data.get("tags")
             transcription_category = message_data.get("category")
+            channel_id = message_data.get("channelId")
+            video_id = message_data.get("videoId")
+            audio_part = message_data.get("audioPart")
 
             if not transcription_text:
                 raise ValueError("Missing transcription text in message")
@@ -84,7 +88,7 @@ async def consume_messages():
             logger.info(f"Categorized transcription: {category}")
 
             # Send the categorized message to the next queue
-            categorized_message = {"category": category}
+            categorized_message = {"categorization_result": category, "channelId": channel_id, "videoId": video_id, "audio_part": audio_part, "transcription": transcription_text}
             send_to_queue(CATEGORIZATION_QUEUE, categorized_message)
 
             # Acknowledge the message
