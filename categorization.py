@@ -33,13 +33,16 @@ def categorize_text_with_tags_and_category(text: str, tags=None, category=None, 
         raise ValueError("Input text cannot be empty")
 
     # Perform the zero-shot classification
-    result = classifier(text, candidate_labels, multi_label=False)  # Use multi_label instead of multi_class
+    result = classifier(text, candidate_labels, multi_label=False)
 
-    # Return top_k categories
-    top_categories = result['labels'][:top_k]
-    top_scores = result['scores'][:top_k]
+    # Combine categories and scores into a list of dictionaries
+    categorized_results = [
+        {"category": label, "score": score}
+        for label, score in zip(result['labels'][:top_k], result['scores'][:top_k])
+    ]
 
-    return {'categories': top_categories, 'scores': top_scores}
+    return categorized_results
+
 
 
 # Example Usage

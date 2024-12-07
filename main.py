@@ -84,13 +84,10 @@ async def consume_messages():
                 raise ValueError("Missing transcription text in message")
 
             # Categorize the transcription
-            category = categorize_text_with_tags_and_category(transcription_text, tags=transcription_tags, category=transcription_category)
-            logger.info(f"Categorized transcription: {category}")
-
+            categorization_result = categorize_text_with_tags_and_category(transcription_text, tags=transcription_tags, category=transcription_category)
             # Send the categorized message to the next queue
-            categorized_message = {"categorization_result": category, "channelId": channel_id, "videoId": video_id, "audio_part": audio_part, "transcription": transcription_text}
+            categorized_message = {"categorization_result": categorization_result, "channelId": channel_id, "videoId": video_id, "audio_part": audio_part, "transcription": transcription_text}
             send_to_queue(CATEGORIZATION_QUEUE, categorized_message)
-
             # Acknowledge the message
             ch.basic_ack(delivery_tag=method.delivery_tag)
         except Exception as e:
