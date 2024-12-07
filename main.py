@@ -125,7 +125,7 @@ async def root():
 async def categorize_text_request(transcription: TranscriptionRequest):
     """Categorize text via HTTP POST."""
     try:
-        category = categorize_text(transcription.transcription)
+        category = categorize_text_with_tags_and_category(transcription.transcription)
         return {"category": category}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
