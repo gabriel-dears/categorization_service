@@ -10,7 +10,7 @@ COPY . /app
 # Update apt, install venv, and clean up
 # Install necessary packages for PyAudio
 RUN apt-get update && \
-    apt-get install -y python3-venv python3-dev portaudio19-dev && \
+    apt-get install -y python3-venv python3-dev portaudio19-dev libpq-dev gcc && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a virtual environment in /opt/venv and add it to the PATH
